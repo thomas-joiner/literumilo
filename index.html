@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Literumilo : This library provides a GUI for adding spell-checking to JTextComponents with a pluggable spelling library." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Literumilo</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/thomas-joiner/literumilo">View on GitHub</a>
+
+          <h1 id="project_title">Literumilo</h1>
+          <h2 id="project_tagline">This library provides a GUI for adding spell-checking to JTextComponents with a pluggable spelling library.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/thomas-joiner/literumilo/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/thomas-joiner/literumilo/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>literumilo</h1>
+
+<p>This library provides a GUI for adding spell-checking to JTextComponents with a pluggable spelling library.</p>
+
+<hr><p>Until hunspell gets added to the Maven Central, you will have to install it as <code>dk.dren:hunspell:1.3.2</code> in your local repository/Nexus installation.</p>
+
+<hr><p>In order to use the library, you must first initialize the <code>Spellchecker</code> to be used by the library.  As an example, for <code>HunspellSpellchecker</code> one would do something like the following:</p>
+
+<div class="highlight"><pre><span class="n">Dictionary</span> <span class="n">dict</span> <span class="o">=</span> <span class="o">...</span> <span class="c1">// retrieve HunspellJNA dictionary.</span>
+
+<span class="n">HunspellSpellchecker</span> <span class="n">spellchecker</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HunspellSpellchecker</span><span class="o">();</span>
+<span class="n">spellchecker</span><span class="o">.</span><span class="na">addDictionary</span><span class="o">(</span><span class="k">new</span> <span class="n">Locale</span><span class="o">(</span><span class="s">"en"</span><span class="o">,</span> <span class="s">"US"</span><span class="o">),</span> <span class="cm">/* or whatever locale you wish */</span>
+                            <span class="n">dict</span><span class="o">);</span>
+
+<span class="n">Literumilo</span><span class="o">.</span><span class="na">setSpellchecker</span><span class="o">(</span><span class="n">spellchecker</span><span class="o">);</span>
+</pre></div>
+
+<p>After that is done, you can now register components to be spellchecked.  If you have no context menus registered on the text component already, it is as simple as doing the following:</p>
+
+<div class="highlight"><pre><span class="n">Literumilo</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="n">component</span><span class="o">);</span>
+</pre></div>
+
+<p>However, if you do already have context menus, there is a way to work with that.  First thing you will need to do is to register the component:</p>
+
+<div class="highlight"><pre><span class="n">SpellcheckedComponent</span> <span class="n">spellcheckedComponent</span> <span class="o">=</span> <span class="n">Literumilo</span><span class="o">.</span><span class="na">register</span><span class="o">(</span><span class="n">component</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+</pre></div>
+
+<p>Note how you pass <code>false</code> as a second parameter, which instructs it to not register the menus, and how you keep a handle on the <code>SpellcheckedComponent</code> returned from the register method.</p>
+
+<p>Now that you have it registered, you can retrieve a <code>List&lt;Action&gt;</code> that will perform the replacement of the words, as well as retrieve a <code>List&lt;JMenuItem&gt;</code> that will allow the user to switch languages.</p>
+
+<div class="highlight"><pre><span class="n">JMenu</span> <span class="n">spellingMenu</span> <span class="o">=</span> <span class="o">...</span> <span class="c1">// retrieve the menu you are adding spellchecking suggestions to</span>
+<span class="cm">/* where e is the MouseEvent that caused the menu creation...the Point is used to figure out which word was triggered on */</span>
+<span class="n">List</span><span class="o">&lt;</span><span class="n">Action</span><span class="o">&gt;</span> <span class="n">spellcheckSuggestions</span> <span class="o">=</span> <span class="n">spellcheckedComponent</span><span class="o">.</span><span class="na">getSpellcheckSuggestions</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getPoint</span><span class="o">());</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">Action</span> <span class="n">suggestion</span> <span class="o">:</span> <span class="n">spellcheckSuggestions</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">spellingMenu</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">suggestion</span><span class="o">);</span>
+<span class="o">}</span>
+
+<span class="c1">// Add the language selection items.</span>
+<span class="n">JMenu</span> <span class="n">languageMenu</span> <span class="o">=</span> <span class="o">...</span> <span class="c1">// retrieve the menu that you are adding the language selectors to</span>
+<span class="k">for</span> <span class="o">(</span><span class="n">JMenuItem</span> <span class="n">language</span> <span class="o">:</span> <span class="n">spellcheckedComponent</span><span class="o">.</span><span class="na">getLanguageSelectors</span><span class="o">())</span> <span class="o">{</span>
+    <span class="n">languageMenu</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">language</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+
+<hr><p>Known Limitations:</p>
+
+<ul>
+<li>The provided <code>Tokenizer</code> is quite primitive.</li>
+</ul><hr><p>Note that this project is unlikely to undergo any more major development.  I am no longer working on the project that I created this for, and none of my current projects involve Swing.  However, I will happily accept pull requests, and I will try to be responsive to any issues found with the library.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Literumilo maintained by <a href="https://github.com/thomas-joiner">thomas-joiner</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
