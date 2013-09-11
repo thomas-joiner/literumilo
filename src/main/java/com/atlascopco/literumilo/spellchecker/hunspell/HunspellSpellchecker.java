@@ -24,10 +24,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.atlascopco.hunspell.Hunspell;
 import com.atlascopco.literumilo.spellchecker.Spellchecker;
-
-import dk.dren.hunspell.Hunspell;
-import dk.dren.hunspell.Hunspell.Dictionary;
 
 /**
  * This is an implementation of the {@link Spellchecker} interface that uses HunspellJNA
@@ -37,8 +35,8 @@ import dk.dren.hunspell.Hunspell.Dictionary;
  */
 public class HunspellSpellchecker implements Spellchecker {
 
-	private final Map<Locale, Dictionary> dictionaries;
-	private Dictionary currentDictionary;
+	private final Map<Locale, Hunspell> dictionaries;
+	private Hunspell currentDictionary;
 	/**
 	 * We hold only weak references to the listeners since the lifetime of the {@link Spellchecker}
 	 * will ostensibly last the whole program, however more than likely, the components it spell-checks
@@ -47,21 +45,21 @@ public class HunspellSpellchecker implements Spellchecker {
 	private final List<WeakReference<DictionaryChangeListener>> listeners;
 
 	public HunspellSpellchecker() {
-		this.dictionaries = new HashMap<Locale, Hunspell.Dictionary>();
+		this.dictionaries = new HashMap<Locale, Hunspell>();
 		this.listeners = new ArrayList<WeakReference<DictionaryChangeListener>>();
 	}
 
-	public void addDictionary(Locale locale, Dictionary dictionary) {
+	public void addDictionary(Locale locale, Hunspell dictionary) {
 		if ( this.currentDictionary == null ) {
 			this.currentDictionary = dictionary;
 		}
-
+		
 		this.dictionaries.put(locale, dictionary);
 	}
 
 	@Override
 	public boolean misspelled(String word) {
-		return this.currentDictionary.misspelled(word);
+		return !this.currentDictionary.spell(word);
 	}
 
 	@Override
@@ -87,7 +85,7 @@ public class HunspellSpellchecker implements Spellchecker {
 
 	@Override
 	public Locale getCurrentDictionary() {
-		for (Entry<Locale, Dictionary> entry : this.dictionaries.entrySet()) {
+		for (Entry<Locale, Hunspell> entry : this.dictionaries.entrySet()) {
 			if ( entry.getValue() == this.currentDictionary ) {
 				return entry.getKey();
 			}
