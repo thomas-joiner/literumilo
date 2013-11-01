@@ -5,14 +5,10 @@ This library provides a GUI for adding spell-checking to JTextComponents with a 
 
 ---
 
-Until hunspell gets added to the Maven Central, you will have to install it as `dk.dren:hunspell:1.3.2` in your local repository/Nexus installation.
-
----
-
 In order to use the library, you must first initialize the `Spellchecker` to be used by the library.  As an example, for `HunspellSpellchecker` one would do something like the following:
 
 ```java
-Dictionary dict = ... // retrieve HunspellJNA dictionary.
+Hunspell dict = ... // retrieve HunspellBridJ dictionary.
 
 HunspellSpellchecker spellchecker = new HunspellSpellchecker();
 spellchecker.addDictionary(new Locale("en", "US"), /* or whatever locale you wish */
