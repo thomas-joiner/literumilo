@@ -121,7 +121,7 @@ public class SpellcheckedComponent implements DocumentListener, DictionaryChange
 		} else {
 			Highlighter highlighter = this.component.getHighlighter();
 			for (WordToken token : this.highlights) {
-				highlighter.removeHighlight(token);
+				highlighter.removeHighlight(token.getHighlightTag());
 			}
 
 			this.component.getDocument().removeDocumentListener(this);
