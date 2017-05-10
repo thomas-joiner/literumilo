@@ -59,11 +59,21 @@ public class HunspellSpellchecker implements Spellchecker {
 
 	@Override
 	public boolean misspelled(String word) {
+		// hunspell has a maximum word length of 256
+		if (word.length() > 256) {
+			return false;
+		}
+		
 		return !this.currentDictionary.spell(word);
 	}
 
 	@Override
 	public List<String> suggest(String word) {
+		// hunspell has a maximum word length of 256
+		if (word.length() > 256) {
+			return new ArrayList<String>();
+		}
+		
 		return this.currentDictionary.suggest(word);
 	}
 
